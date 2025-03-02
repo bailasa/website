@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Management System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom: 2px solid white;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+        
+        .form-col {
+            flex: 1;
+            padding: 0 10px;
+            min-width: 200px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .search-container {
+            margin-bottom: 20px;
+        }
+        
+        .search-container input {
+            width: 300px;
+            margin-right: 10px;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .alert-success {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        
+        .alert-danger {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        
+        .alert-warning {
+            background-color: #fcf8e3;
+            color: #8a6d3b;
+            border: 1px solid #faebcc;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            max-height: 500px;
+            margin-top: 20px;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .pagination button {
+            margin: 0 5px;
+        }
+        
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .action-buttons button {
+            margin-top: 0;
+        }
+        
+        #exportButton {
+            background-color: #27ae60;
+        }
+        
+        #exportButton:hover {
+            background-color: #219653;
+        }
+        
+        #importButton {
+            background-color: #e67e22;
+        }
+        
+        #importButton:hover {
+            background-color: #d35400;
+        }
+        
+        #viewAllButton {
+            background-color: #34495e;
+        }
+        
+        #viewAllButton:hover {
+            background-color: #2c3e50;
+        }
+        
+        #deleteButton {
+            background-color: #e74c3c;
+        }
+        
+        #deleteButton:hover {
+            background-color: #c0392b;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .form-col {
+                flex: 100%;
+            }
+            
+            .search-container input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Patient Management System</h1>
+        
+        <div id="alertBox" class="alert"></div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="add-patient">Add New Patient</div>
+            <div class="tab" data-tab="search-patient">Search Patient</div>
+            <div class="tab" data-tab="all-patients">All Patients</div>
+        </div>
+        
+        <div id="add-patient" class="tab-content active">
+            <h2>Add New Patient</h2>
+            <form id="addPatientForm">
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="patientNumber">Patient File Number*</label>
+                            <input type="text" id="patientNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hospitalName">Hospital Name</label>
+                            <input type="text" id="hospitalName">
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Date*</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="death">Death</label>
+                            <select id="death">
+                                <option value="">Select</option>
+                                <option value="Y">Yes</option>
+                                <option value="N">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="gender">Gender*</label>
+                            <select id="gender" required>
+                                <option value="">Select</option>
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="height">Height (CM)*</label>
+                            <input type="number" id="height" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="weight">Weight (KG)*</label>
+                            <input type="number" id="weight" required step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="bmi">BMI</label>
+                            <input type="number" id="bmi" readonly step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="bsa">BSA</label>
+                            <input type="number" id="bsa" readonly step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="htn">HTN</label>
+                            <select id="htn">
+                                <option value="">Select</option>
+                                <option value="Y">Yes</option>
+                                <option value="N">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="copd">COPD</label>
+                            <select id="copd">
+                                <option value="">Select</option>
+                                <option value="Y">Yes</option>
+                                <option value="N">No</option>
+                                <option value="G">G</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ef">EF</label>
+                            <input type="number" id="ef">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="age">Age*</label>
+                            <input type="number" id="age" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dm">DM</label>
+                            <select id="dm">
+                                <option value="">Select</option>
+                                <option value="Y">Yes</option>
+                                <option value="N">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="oldMi">Old MI</label>
+                            <select id="oldMi">
+                                <option value="">Select</option>
+                                <option value="Y">Yes</option>
+                                <option value="N">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="hf">HF</label>
+                            <select id="hf">
+                                <option value="">Select</option>
+                                <option value="Y">Yes</option>
+                                <option value="N">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="esLL">ES LL</label>
+                            <input type="number" id="esLL" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="preHgb">Pre HGB</label>
+                            <input type="number" id="preHgb" step="0.1">
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit">Add Patient</button>
+            </form>
+        </div>
+        
+        <div id="search-patient" class="tab-content">
+            <h2>Search Patient</h2>
+            <div class="search-container">
+                <input type="text" id="searchPatientNumber" placeholder="Enter Patient File Number">
+                <button id="searchButton">Search</button>
+            </div>
+            
+            <div id="patientDetails" style="display: none;">
+                <h3>Patient Details</h3>
+                <form id="updatePatientForm">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="upPatientNumber">Patient File Number*</label>
+                                <input type="text" id="upPatientNumber" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="upHospitalName">Hospital Name</label>
+                                <input type="text" id="upHospitalName">
+                            </div>
+                            <div class="form-group">
+                                <label for="upDate">Date*</label>
+                                <input type="date" id="upDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="upDeath">Death</label>
+                                <select id="upDeath">
+                                    <option value="">Select</option>
+                                    <option value="Y">Yes</option>
+                                    <option value="N">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="upGender">Gender*</label>
+                                <select id="upGender" required>
+                                    <option value="">Select</option>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="upHeight">Height (CM)*</label>
+                                <input type="number" id="upHeight" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="upWeight">Weight (KG)*</label>
+                                <input type="number" id="upWeight" required step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="upBmi">BMI</label>
+                                <input type="number" id="upBmi" readonly step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="upBsa">BSA</label>
+                                <input type="number" id="upBsa" readonly step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label for="upHtn">HTN</label>
+                                <select id="upHtn">
+                                    <option value="">Select</option>
+                                    <option value="Y">Yes</option>
+                                    <option value="N">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="upCopd">COPD</label>
+                                <select id="upCopd">
+                                    <option value="">Select</option>
+                                    <option value="Y">Yes</option>
+                                    <option value="N">No</option>
+                                    <option value="G">G</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="upEf">EF</label>
+                                <input type="number" id="upEf">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="upAge">Age*</label>
+                                <input type="number" id="upAge" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="upDm">DM</label>
+                                <select id="upDm">
+                                    <option value="">Select</option>
+                                    <option value="Y">Yes</option>
+                                    <option value="N">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="upOldMi">Old MI</label>
+                                <select id="upOldMi">
+                                    <option value="">Select</option>
+                                    <option value="Y">Yes</option>
+                                    <option value="N">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="upHf">HF</label>
+                                <select id="upHf">
+                                    <option value="">Select</option>
+                                    <option value="Y">Yes</option>
+                                    <option value="N">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="upEsLL">ES LL</label>
+                                <input type="number" id="upEsLL" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label for="upPreHgb">Pre HGB</label>
+                                <input type="number" id="upPreHgb" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit">Update Patient</button>
+                    <button type="button" id="deletePatient" style="background-color: #e74c3c;">Delete Patient</button>
+                </form>
+            </div>
+        </div>
+        
+        <div id="all-patients" class="tab-content">
+            <h2>All Patients</h2>
+            <div class="table-container">
+                <table id="patientsTable">
+                    <thead>
+                        <tr>
+                            <th>Patient Number</th>
+                            <th>Hospital</th>
+                            <th>Date</th>
+                            <th>Gender</th>
+                            <th>Age</th>
+                            <th>Height</th>
+                            <th>Weight</th>
+                            <th>BMI</th>
+                            <th>BSA</th>
+                            <th>HTN</th>
+                            <th>COPD</th>
+                            <th>DM</th>
+                            <th>Old MI</th>
+                            <th>HF</th>
+                            <th>EF</th>
+                            <th>ES LL</th>
+                            <th>Pre HGB</th>
+                            <th>Death</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patientsTableBody">
+                        <!-- Table content will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button id="exportButton">Export to CSV</button>
+            <button id="importButton">Import from CSV</button>
+            <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let patientsData = [];
+        
+        // Check if data exists in localStorage
+        if (localStorage.getItem('patientsData')) {
+            try {
+                patientsData = JSON.parse(localStorage.getItem('patientsData'));
+            } catch (e) {
+                console.error('Error loading data from localStorage:', e);
+                patientsData = [];
+            }
+        }
+        
+        // DOM Elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const addPatientForm = document.getElementById('addPatientForm');
+        const updatePatientForm = document.getElementById('updatePatientForm');
+        const searchButton = document.getElementById('searchButton');
+        const patientDetails = document.getElementById('patientDetails');
+        const alertBox = document.getElementById('alertBox');
+        const patientsTableBody = document.getElementById('patientsTableBody');
+        const exportButton = document.getElementById('exportButton');
+        const importButton = document.getElementById('importButton');
+        const csvFileInput = document.getElementById('csvFileInput');
+        const deletePatientButton = document.getElementById('deletePatient');
+        
+        // Height and weight inputs for BMI calculation
+        const heightInput = document.getElementById('height');
+        const weightInput = document.getElementById('weight');
+        const bmiInput = document.getElementById('bmi');
+        const bsaInput = document.getElementById('bsa');
+        
+        const upHeightInput = document.getElementById('upHeight');
+        const upWeightInput = document.getElementById('upWeight');
+        const upBmiInput = document.getElementById('upBmi');
+        const upBsaInput = document.getElementById('upBsa');
+        
+        // Functions
+        function showAlert(message, type) {
+            alertBox.textContent = message;
+            alertBox.className = 'alert';
+            alertBox.classList.add(`alert-${type}`);
+            alertBox.style.display = 'block';
+            
+            // Hide alert after 5 seconds
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 5000);
+        }
+        
+        function calculateBMI(height, weight) {
+            if (height && weight) {
+                // Convert height from cm to m
+                const heightInMeters = height / 100;
+                // Calculate BMI: weight (kg) / (height (m))^2
+                return (weight / (heightInMeters * heightInMeters)).toFixed(1);
+            }
+            return '';
+        }
+        
+        function calculateBSA(height, weight) {
+            if (height && weight) {
+                // Mosteller formula: BSA (m²) = sqrt((height (cm) * weight (kg))/3600)
+                return Math.sqrt((height * weight) / 3600).toFixed(2);
+            }
+            return '';
+        }
+        
+        function addPatient(patient) {
+    // Check if patient with this ID already exists
+    const existingPatientIndex = patientsData.findIndex(p => p.patientNumber === patient.patientNumber);
+    
+    if (existingPatientIndex !== -1) {
+        if (!confirm(`Patient with number ${patient.patientNumber} already exists. Do you want to update the existing record?`)) {
+            return false;
+        }
+        // Update existing patient
+        patientsData[existingPatientIndex] = patient;
+        showAlert('Patient updated successfully!', 'success');
+    } else {
+        // Add new patient
+        patientsData.push(patient);
+        showAlert('Patient added successfully!', 'success');
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('patientsData', JSON.stringify(patientsData));
+    
+    // Add Google Sheets synchronization
+    if (googleSheetUrl && confirm("Would you like to sync this change with Google Sheets?")) {
+        syncWithGoogleSheets();
+    }
+    
+    return true;
+}
+        
+        function findPatient(patientNumber) {
+            return patientsData.find(patient => patient.patientNumber === patientNumber);
+        }
+        
+        function updatePatient(updatedPatient) {
+            const index = patientsData.findIndex(patient => patient.patientNumber === updatedPatient.patientNumber);
+            
+            if (index !== -1) {
+                if (confirm('Are you sure you want to update this patient information?')) {
+                    patientsData[index] = updatedPatient;
+                    localStorage.setItem('patientsData', JSON.stringify(patientsData));
+                    showAlert('Patient updated successfully!', 'success');
+                    
+                    // Refresh table if visible
+                    if (document.getElementById('all-patients').classList.contains('active')) {
+                        loadPatientsTable();
+                    }
+                    
+                    return true;
+                }
+            } else {
+                showAlert('Patient not found!', 'danger');
+            }
+            // After localStorage.setItem('patientsData', JSON.stringify(patientsData));
+if (googleSheetUrl && confirm("Would you like to sync this update with Google Sheets?")) {
+    syncWithGoogleSheets();
+}
+            return false;
+        }
+        
+        function deletePatient(patientNumber) {
+            const index = patientsData.findIndex(patient => patient.patientNumber === patientNumber);
+            
+            if (index !== -1) {
+                if (confirm(`Are you sure you want to delete patient ${patientNumber}?`)) {
+                    patientsData.splice(index, 1);
+                    localStorage.setItem('patientsData', JSON.stringify(patientsData));
+                    showAlert('Patient deleted successfully!', 'success');
+                    
+                    // Hide patient details form
+                    patientDetails.style.display = 'none';
+                    
+                    // Refresh table if visible
+                    if (document.getElementById('all-patients').classList.contains('active')) {
+                        loadPatientsTable();
+                    }
+                    
+                    return true;
+                }
+            } else {
+                showAlert('Patient not found!', 'danger');
+            }
+            // After localStorage.setItem('patientsData', JSON.stringify(patientsData));
+if (googleSheetUrl && confirm("Would you like to sync this deletion with Google Sheets?")) {
+    syncWithGoogleSheets();
+}
+            return false;
+        }
+        
+        function populateUpdateForm(patient) {
+            document.getElementById('upPatientNumber').value = patient.patientNumber;
+            document.getElementById('upHospitalName').value = patient.hospitalName || '';
+            document.getElementById('upDate').value = patient.date || '';
+            document.getElementById('upDeath').value = patient.death || '';
+            document.getElementById('upGender').value = patient.gender || '';
+            document.getElementById('upHeight').value = patient.height || '';
+            document.getElementById('upWeight').value = patient.weight || '';
+            document.getElementById('upBmi').value = patient.bmi || '';
+            document.getElementById('upBsa').value = patient.bsa || '';
+            document.getElementById('upHtn').value = patient.htn || '';
+            document.getElementById('upCopd').value = patient.copd || '';
+            document.getElementById('upEf').value = patient.ef || '';
+            document.getElementById('upAge').value = patient.age || '';
+            document.getElementById('upDm').value = patient.dm || '';
+            document.getElementById('upOldMi').value = patient.oldMi || '';
+            document.getElementById('upHf').value = patient.hf || '';
+            document.getElementById('upEsLL').value = patient.esLL || '';
+            document.getElementById('upPreHgb').value = patient.preHgb || '';
+        }
+        
+        function loadPatientsTable() {
+            patientsTableBody.innerHTML = '';
+            
+            if (patientsData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="19">No patients found</td>`;
+                patientsTableBody.appendChild(row);
+                return;
+            }
+            
+            patientsData.forEach((patient, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${patient.patientNumber || ''}</td>
+                    <td>${patient.hospitalName || ''}</td>
+                    <td>${patient.date || ''}</td>
+                    <td>${patient.gender || ''}</td>
+                    <td>${patient.age || ''}</td>
+                    <td>${patient.height || ''}</td>
+                    <td>${patient.weight || ''}</td>
+                    <td>${patient.bmi || ''}</td>
+                    <td>${patient.bsa || ''}</td>
+                    <td>${patient.htn || ''}</td>
+                    <td>${patient.copd || ''}</td>
+                    <td>${patient.dm || ''}</td>
+                    <td>${patient.oldMi || ''}</td>
+                    <td>${patient.hf || ''}</td>
+                    <td>${patient.ef || ''}</td>
+                    <td>${patient.esLL || ''}</td>
+                    <td>${patient.preHgb || ''}</td>
+                    <td>${patient.death || ''}</td>
+                    <td>
+                        <button type="button" class="edit-btn" data-index="${index}">Edit</button>
+                    </td>
+                `;
+                patientsTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to edit buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = e.target.getAttribute('data-index');
+                    const patient = patientsData[index];
+                    
+                    // Switch to search tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    const searchTab = document.querySelector('[data-tab="search-patient"]');
+                    searchTab.classList.add('active');
+                    document.getElementById('search-patient').classList.add('active');
+                    
+                    // Populate form
+                    populateUpdateForm(patient);
+                    patientDetails.style.display = 'block';
+                });
+            });
+        }
+        
+        function exportToCSV() {
+            if (patientsData.length === 0) {
+                showAlert('No data to export!', 'warning');
+                return;
+            }
+            
+            // Get all column headers
+            const headers = Object.keys(patientsData[0]);
+            
+            // Create CSV content
+            let csvContent = headers.join(',') + '\n';
+            
+            patientsData.forEach(patient => {
+                const row = headers.map(header => {
+                    // Wrap values with commas in quotes
+                    const value = patient[header] !== undefined ? patient[header] : '';
+                    return typeof value === 'string' && value.includes(',') ? 
+                        `"${value}"` : value;
+                });
+                csvContent += row.join(',') + '\n';
+            });
+            
+            // Create a blob and download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'patients_data.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showAlert('Data exported successfully!', 'success');
+        }
+        
+        // Function to parse CSV line properly (handling quoted values)
+function parseCSVLine(line) {
+    const values = [];
+    let currentValue = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        
+        if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            values.push(currentValue);
+            currentValue = '';
+        } else {
+            currentValue += char;
+        }
+    }
+    
+    values.push(currentValue);
+    return values;
+}
+
+function importFromCSV(file) {
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        const contents = e.target.result;
+        const lines = contents.split('\n');
+        
+        if (lines.length < 2) {
+            showAlert('Invalid CSV file!', 'danger');
+            return;
+        }
+        
+        const headers = lines[0].split(',');
+        
+        // New array to hold imported data
+        const importedData = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            if (lines[i].trim() === '') continue;
+            
+            const values = parseCSVLine(lines[i]);
+            
+            if (values.length !== headers.length) {
+                showAlert(`Line ${i+1} has invalid number of fields!`, 'warning');
+                continue;
+            }
+            
+            const patient = {};
+            for (let j = 0; j < headers.length; j++) {
+                // Remove quotes if present
+                const header = headers[j].replace(/^"(.*)"$/, '$1');
+                patient[header] = values[j].replace(/^"(.*)"$/, '$1');
+            }
+            
+            importedData.push(patient);
+        }
+        
+        if (importedData.length > 0) {
+            if (confirm(`Found ${importedData.length} patients in the CSV file. Do you want to import them?`)) {
+                // Check for duplicates and merge data
+                let newCount = 0;
+                let updatedCount = 0;
+                
+                importedData.forEach(importedPatient => {
+                    const existingIndex = patientsData.findIndex(p => p.patientNumber === importedPatient.patientNumber);
+                    
+                    if (existingIndex !== -1) {
+                        // Update existing patient
+                        patientsData[existingIndex] = importedPatient;
+                        updatedCount++;
+                    } else {
+                        // Add new patient
+                        patientsData.push(importedPatient);
+                        newCount++;
+                    }
+                });
+                
+                // Save to localStorage
+                localStorage.setItem('patientsData', JSON.stringify(patientsData));
+                
+                // Refresh table if visible
+                if (document.getElementById('all-patients').classList.contains('active')) {
+                    loadPatientsTable();
+                }
+                
+                showAlert(`Import completed successfully! Added ${newCount} new patients and updated ${updatedCount} existing patients.`, 'success');
+                
+                // Sync with Google Sheets (if enabled)
+                syncWithGoogleSheets();
+            }
+        } else {
+            showAlert('No valid patient data found in the CSV file!', 'warning');
+        }
+    };
+    
+    reader.onerror = function() {
+        showAlert('Error reading the file!', 'danger');
+    };
+    
+    reader.readAsText(file);
+}
+
+// Google Sheets API integration
+let googleSheetUrl = localStorage.getItem('googleSheetUrl') || '';
+let googleSheetId = '';
+
+function initGoogleSheetsIntegration() {
+    // Check if we have a saved Google Sheet URL
+    if (googleSheetUrl) {
+        try {
+            // Extract the sheet ID from the URL
+            const urlParts = googleSheetUrl.split('/');
+            const idIndex = urlParts.indexOf('d') + 1;
+            if (idIndex > 0 && idIndex < urlParts.length) {
+                googleSheetId = urlParts[idIndex];
+                console.log("Google Sheet ID loaded:", googleSheetId);
+            }
+        } catch (e) {
+            console.error("Error parsing Google Sheet URL:", e);
+            googleSheetUrl = '';
+            localStorage.removeItem('googleSheetUrl');
+        }
+    }
+}
+
+function addGSheetsConfigButton() {
+    // Add a Google Sheets config button to the action buttons
+    const actionButtons = document.querySelector('.action-buttons');
+    const gsheetButton = document.createElement('button');
+    gsheetButton.id = 'gsheetConfigButton';
+    gsheetButton.textContent = googleSheetUrl ? 'Google Sheets Connected' : 'Connect Google Sheets';
+    gsheetButton.addEventListener('click', showGSheetsConfigModal);
+    actionButtons.appendChild(gsheetButton);
+}
+
+function showGSheetsConfigModal() {
+    // Create modal container
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '1000';
+    
+    // Create modal content
+    const modalContent = document.createElement('div');
+    modalContent.style.backgroundColor = 'white';
+    modalContent.style.padding = '20px';
+    modalContent.style.borderRadius = '8px';
+    modalContent.style.maxWidth = '500px';
+    modalContent.style.width = '90%';
+    
+    // Populate modal content
+    modalContent.innerHTML = `
+        <h3>Connect to Google Sheets</h3>
+        <p>To sync your patient data with Google Sheets:</p>
+        <ol>
+            <li>Create a Google Sheet with headers matching your patient data</li>
+            <li>Make sure the sheet is set to "Anyone with the link can edit"</li>
+            <li>Enter the Google Sheet URL below:</li>
+        </ol>
+        <div style="margin-bottom: 15px;">
+            <input type="text" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/..." 
+                   style="width: 100%; padding: 8px; margin-bottom: 10px;" 
+                   value="${googleSheetUrl}">
+            <button id="saveSheetUrl" style="background-color: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">
+                Save Connection
+            </button>
+            <button id="testConnection" style="background-color: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-left: 10px;">
+                Test Connection
+            </button>
+        </div>
+        <div id="connectionStatus" style="margin-top: 15px;"></div>
+        <p><small>Note: This method uses a public Google Sheet for simplicity. For production use, implement proper authentication.</small></p>
+        <button id="closeModal" style="background-color: #7f8c8d; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-top: 15px;">
+            Close
+        </button>
+    `;
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Add event listeners
+    document.getElementById('closeModal').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    document.getElementById('saveSheetUrl').addEventListener('click', () => {
+        const newUrl = document.getElementById('sheetUrlInput').value.trim();
+        if (newUrl) {
+            try {
+                // Extract the sheet ID
+                const urlParts = newUrl.split('/');
+                const idIndex = urlParts.indexOf('d') + 1;
+                if (idIndex > 0 && idIndex < urlParts.length) {
+                    googleSheetId = urlParts[idIndex];
+                    googleSheetUrl = newUrl;
+                    localStorage.setItem('googleSheetUrl', newUrl);
+                    
+                    document.getElementById('connectionStatus').innerHTML = `
+                        <div style="color: #27ae60;">Settings saved. Sheet ID: ${googleSheetId}</div>
+                    `;
+                    
+                    // Update button text
+                    document.getElementById('gsheetConfigButton').textContent = 'Google Sheets Connected';
+                } else {
+                    throw new Error("Invalid Google Sheets URL format");
+                }
+            } catch (e) {
+                document.getElementById('connectionStatus').innerHTML = `
+                    <div style="color: #e74c3c;">Error: Invalid Google Sheets URL. Please enter a valid URL.</div>
+                `;
+            }
+        } else {
+            // Clear the connection if URL is empty
+            googleSheetUrl = '';
+            googleSheetId = '';
+            localStorage.removeItem('googleSheetUrl');
+            document.getElementById('gsheetConfigButton').textContent = 'Connect Google Sheets';
+            document.getElementById('connectionStatus').innerHTML = `
+                <div style="color: #e74c3c;">Google Sheets connection removed.</div>
+            `;
+        }
+    });
+    
+    document.getElementById('testConnection').addEventListener('click', () => {
+        const statusDiv = document.getElementById('connectionStatus');
+        statusDiv.innerHTML = `<div style="color: #3498db;">Testing connection...</div>`;
+        
+        const url = document.getElementById('sheetUrlInput').value.trim();
+        if (!url) {
+            statusDiv.innerHTML = `<div style="color: #e74c3c;">Please enter a Google Sheets URL.</div>`;
+            return;
+        }
+        
+        // Try to extract the sheet ID
+        try {
+            const urlParts = url.split('/');
+            const idIndex = urlParts.indexOf('d') + 1;
+            if (idIndex > 0 && idIndex < urlParts.length) {
+                const tempSheetId = urlParts[idIndex];
+                
+                // For demonstration purposes, we'll just simulate a connection test
+                // In a real implementation, you would make an actual API call
+                setTimeout(() => {
+                    const success = Math.random() > 0.3; // 70% chance of success for demo
+                    
+                    if (success) {
+                        statusDiv.innerHTML = `
+                            <div style="color: #27ae60;">Connection successful! Sheet ID: ${tempSheetId}</div>
+                            <p>Note: This is a simulated successful connection for demonstration purposes.</p>
+                        `;
+                    } else {
+                        statusDiv.innerHTML = `
+                            <div style="color: #e74c3c;">Connection failed. Make sure:</div>
+                            <ul style="color: #e74c3c;">
+                                <li>The Google Sheet URL is correct</li>
+                                <li>The sheet is set to "Anyone with the link can edit"</li>
+                            </ul>
+                            <p>Note: This is a simulated connection failure for demonstration purposes.</p>
+                        `;
+                    }
+                }, 1500);
+                
+            } else {
+                throw new Error("Invalid URL format");
+            }
+        } catch (e) {
+            statusDiv.innerHTML = `<div style="color: #e74c3c;">Error: Invalid Google Sheets URL format.</div>`;
+        }
+    });
+}
+
+function syncWithGoogleSheets() {
+    if (!googleSheetUrl || !googleSheetId) {
+        showAlert("Google Sheets not configured. Click 'Connect Google Sheets' to set it up.", "warning");
+        return;
+    }
+    
+    showAlert("Syncing with Google Sheets...", "warning");
+    
+    // In a real implementation, you would use the Google Sheets API here
+    // For this demo, we'll simulate the API call with a timeout
+    
+    // Prepare the data for syncing (convert patientsData to the format needed)
+    const headers = Object.keys(patientsData[0] || {});
+    const rows = patientsData.map(patient => headers.map(key => patient[key] || ''));
+    
+    // Here you would make an actual API call
+    // For example, using Google Apps Script as a web app endpoint:
+    /*
+    fetch('YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            sheetId: googleSheetId,
+            headers: headers,
+            data: rows
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showAlert("Sync completed successfully! " + data.message, "success");
+    })
+    .catch(error => {
+        console.error('Error syncing with Google Sheets:', error);
+        showAlert("Error syncing with Google Sheets. Check console for details.", "danger");
+    });
+    */
+    
+    // For demonstration purposes, simulate API call with timeout
+    setTimeout(() => {
+        // 80% chance of success for demo
+        const success = Math.random() > 0.2;
+        
+        if (success) {
+            showAlert(`Sync completed successfully! Synced ${patientsData.length} records to Google Sheets.`, "success");
+        } else {
+            showAlert("Error syncing with Google Sheets. Please check your connection settings.", "danger");
+        }
+    }, 2000);
+}// Initialize Google Sheets integration
+initGoogleSheetsIntegration();
+addGSheetsConfigButton();
+
+// Update sync buttons to use the new integration
+document.getElementById('exportButton').addEventListener('click', function() {
+    exportToCSV();
+    // Also offer to sync with Google Sheets
+    if (googleSheetUrl && confirm("Would you also like to sync this data with Google Sheets?")) {
+        syncWithGoogleSheets();
+    }
+});

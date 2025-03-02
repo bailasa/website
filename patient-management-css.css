@@ -1,0 +1,208 @@
+/* Additional styles for the patient management system */
+
+.google-sheets-connection {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-top: 30px;
+    border-radius: 8px;
+}
+
+.google-sheets-connection code {
+    background-color: #eee;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.quick-search {
+    margin: 10px 0;
+    padding: 8px;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* GitHub Pages specific styles */
+.github-corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 0;
+    z-index: 100;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .form-col {
+        padding: 0;
+        margin-bottom: 15px;
+    }
+    
+    .tabs {
+        flex-wrap: wrap;
+    }
+    
+    .tab {
+        margin-bottom: 5px;
+    }
+}
+
+/* Status indicator for sync */
+.sync-status {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 12px;
+    border-radius: 10px;
+    margin-left: 10px;
+}
+
+.sync-status.online {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.sync-status.offline {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Alert animations */
+@keyframes fadeInAlert {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOutAlert {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+}
+
+.alert {
+    animation: fadeInAlert 0.3s ease-out;
+}
+
+.alert.fade-out {
+    animation: fadeOutAlert 0.3s ease-in forwards;
+}
+
+/* Loading spinner for sync operations */
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #3498db;
+    animation: spin 1s ease-in-out infinite;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Print styles */
+@media print {
+    .container {
+        box-shadow: none;
+        max-width: 100%;
+    }
+    
+    .tabs, .action-buttons, button:not(.print-button) {
+        display: none;
+    }
+    
+    .tab-content {
+        display: block !important;
+    }
+    
+    #all-patients {
+        display: block !important;
+    }
+    
+    .table-container {
+        max-height: none;
+        overflow: visible;
+    }
+}
+
+/* Required field indicators */
+label.required:after {
+    content: " *";
+    color: red;
+}
+
+/* Tooltip styles */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 200px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Custom dropdown styling */
+select {
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+}
+
+/* Better focus styles for accessibility */
+input:focus, select:focus, button:focus {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+/* Excel-like table styling */
+#patientsTable {
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+#patientsTable th {
+    background-color: #f2f2f2;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border: 1px solid #ddd;
+}
+
+#patientsTable tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+#gsheetConfigButton {
+    background-color: #9b59b6;
+}
+
+#gsheetConfigButton:hover {
+    background-color: #8e44ad;
+}
